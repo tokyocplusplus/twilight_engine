@@ -3,9 +3,9 @@
 #include <iostream>
 
 #define EXIT_SUCCESS 0
-#define W 800
-#define H 600
-#define T "Pink Window"
+#define WIDTH 800
+#define HEIGHT 600
+#define TITLE "Pink Window"
 
 int main()
 {
@@ -22,7 +22,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     //create window object, set variables
-    GLFWwindow* window = glfwCreateWindow(W, H, T, NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, TITLE, NULL, NULL);
 
     //error checking to see if the window failed to create
     if (!window)
