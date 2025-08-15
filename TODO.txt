@@ -1,0 +1,35 @@
+BASE_LAYER
+{
+OpenGL impl
+{
+	* Initialize glfw3.h
+	* Initialize glad.h
+}
+Graphics
+{
+	* Initialize Matrices
+	* Initialize Objects
+	* Initialize etc
+	* Create Moving Camera
+	* Create Basic GUI
+}
+Render
+{
+	* Render objects (simplify)
+	*
+	*
+	*
+	*
+	*
+}
+
+Decoder
+Audio
+
+Input
+HID
+
+Physics
+Box2D
+Bullet3D
+}
