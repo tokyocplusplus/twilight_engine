@@ -1,4 +1,4 @@
-// for opengl functions
+﻿// for opengl functions
 #include <glad/glad.h>
 
 // for GLFW functions
@@ -14,13 +14,14 @@
 
 // local header files
 #include "Settings/Settings.h"
+#include "Mesh_Handling/model&mesh.h"
 
 // for any circular matrix operations, such as rotation around a radius or rendering a circle, or even a sphere
 #define M_PI 3.14159265358979323846
 
 // vertex shader source code
 const char* vertexShaderSource = R"(
-#version 450 core
+#version 440 core
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aColor;
 uniform mat4 model;
@@ -34,61 +35,26 @@ void main() {
 
 // fragment shader source code
 const char* fragmentShaderSource = R"(
-#version 450 core
+#version 440 core
 in vec3 vColor;
 out vec4 FragColor;
 void main() {
     FragColor = vec4(vColor.xyz, 1.0f);
 })";
 
-float deltaTime = 0.0;
-float currentFrame = 0.0;
-float lastFrame = 0.0;
+float deltaTime = 0.0f;
+float currentFrame = 0.0f;
+float lastFrame = 0.0f;
 
 // vertices array for a cube
-float vertices[] = {
-    // VAL1 = VERTEX,    // VAL2 = COLOR
-    -0.5f, -0.5f, -0.5f,  1.0f,1.0f,0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,1.0f,0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f,1.0f,0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f,1.0f,0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f,1.0f,0.0f,
-    -0.5f, -0.5f, -0.5f,  1.0f,1.0f,0.0f,
+std::vector<Vertex> triVertices = {
+    Vertex(  0.0f, 0.5f,0.0f,  1.0f,0.0f,0.0f  ), // top
+    Vertex(  0.5f,-0.5f,0.0f,  0.0f,1.0f,0.0f  ),     // right
+    Vertex( -0.5f,-0.5f,0.0f,  0.0f,0.0f,1.0f  )     // left
+};
 
-    -0.5f, -0.5f,  0.5f,  0.0f,1.0f,1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f,1.0f,1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,1.0f,1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,1.0f,1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,1.0f,1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f,1.0f,1.0f,
-
-    -0.5f,  0.5f,  0.5f,  1.0f,0.0f,0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f,0.0f,0.0f,
-    -0.5f, -0.5f, -0.5f,  1.0f,0.0f,0.0f,
-    -0.5f, -0.5f, -0.5f,  1.0f,0.0f,0.0f,
-    -0.5f, -0.5f,  0.5f,  1.0f,0.0f,0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f,0.0f,0.0f,
-
-     0.5f,  0.5f,  0.5f,  0.0f,0.0f,1.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,0.0f,1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,0.0f,1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,0.0f,1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f,0.0f,1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,0.0f,1.0f,
-
-    -0.5f, -0.5f, -0.5f,  1.0f,0.0f,1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,0.0f,1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f,0.0f,1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f,0.0f,1.0f,
-    -0.5f, -0.5f,  0.5f,  1.0f,0.0f,1.0f,
-    -0.5f, -0.5f, -0.5f,  1.0f,0.0f,1.0f,
-
-    -0.5f,  0.5f, -0.5f,  1.0f,0.5f,0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f,0.5f,0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f,0.5f,0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f,0.5f,0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f,0.5f,0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f,0.5f,0.0f,
+std::vector<unsigned int> triIndices = {
+    0,1,2
 };
 
 float camX, camY, camZ;
@@ -114,8 +80,8 @@ int main() {
     // Initialize GLFW and create the Window Pointer Object
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Spinning Cube", NULL, NULL);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Twilight Engine - https://github.com/tokyocplusplus/twilight_engine", NULL, NULL);
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -124,22 +90,8 @@ int main() {
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
     // Create Vertex Array Object and Vertex Buffer Object
-    unsigned int VAO, VBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-
-    // Bind the Vertex Array Object and the Vertex Buffer Object
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    
-    // Enable data sending to the GPU, all in strides of 12 bytes
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // Send data. Since the date is only 9 bytes, it has to send a 'fake' block of 3 bytes in order to match the GPU's wants and needs regarding memory safety
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    Mesh triangle(triVertices, triIndices);
+    triangle.setup_mesh();
 
     
     // Create vertex shader
@@ -159,12 +111,13 @@ int main() {
     glLinkProgram(shaderProgram);
     glUseProgram(shaderProgram);
 
+    triangle.assign_shader(shaderProgram);
+
     // VARIABLES
-    unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
+    triangle.setup_model_matrix();
     unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
     unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
     glm::mat4 
-        model,
         view,
         projection;
 
@@ -187,7 +140,6 @@ int main() {
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        std::cout << deltaTime << std::endl;
 
         /*----- MATRICES -----*/
 
@@ -195,10 +147,7 @@ int main() {
         unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
         unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
 
-        // Set the model matrix to make the cube rotate a bit
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, 0.01f, glm::vec3(1.0f, 0.0f, 0.0f));
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
 
         // Create view matrix
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -213,11 +162,9 @@ int main() {
         /*----- MATRICES -----*/
 
 
-        // Bind the vertex data
-        glBindVertexArray(VAO);
-
-        // Use the glDrawArrays() function to send a static draw call each frame, to the GPU
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        // Set the model matrix to make the cube rotate a bit
+        triangle.rotate_mesh();
+        triangle.draw_mesh();
 
         // Swap the front and back buffers as soon as the back buffer is finished rendering.
         glfwSwapBuffers(window);
