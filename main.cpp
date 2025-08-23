@@ -16,6 +16,10 @@
 #include "Settings/Settings.h"
 #include "Mesh_Handling/model&mesh.h"
 
+extern "C" void interopTest(); // extern C funcs
+#include "interop.h"
+
+
 // for any circular matrix operations, such as rotation around a radius or rendering a circle, or even a sphere
 #define M_PI 3.14159265358979323846
 
@@ -76,6 +80,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 // main function (always runs on the main thread)
 int main() {
+    interopTest(); // interoperability test between C and C++
     Settings settings;
     // Initialize GLFW and create the Window Pointer Object
     glfwInit();
