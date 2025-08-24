@@ -12,7 +12,7 @@ void Settings::enable_stencil()
 
 void Settings::enable_depth()
 {
-	glEnable(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void Settings::ClearScreen(GLfloat r, GLfloat g, GLfloat b)
