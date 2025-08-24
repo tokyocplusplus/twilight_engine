@@ -47,6 +47,7 @@ glm::vec3 cubePositions[] = {
 	glm::vec3(-1.3f,  1.0f, -1.5f),
 	glm::vec3(2.1f, 0.0f, -7.0f),
 	glm::vec3(14.0f, -1.0f,-2.0f),
+	glm::vec3(20.0f,11.0f,2.0f),
 };
 
 float camX, camY, camZ;
@@ -117,7 +118,7 @@ int main() {
 	int width, height, nrChannels;
 	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
 	// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-	unsigned char* data = stbi_load("resources/textures/tile.png", &width, &height, &nrChannels, 0);
+	unsigned char* data = stbi_load("TEXTURES/t.png", &width, &height, &nrChannels, 0);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -126,13 +127,6 @@ int main() {
 	else
 	{
 		std::cout << "Failed to load texture 1 (check type)" << std::endl;
-
-
-
-
-
-
-
 	}
 	stbi_image_free(data);
 	// texture 2
@@ -146,7 +140,7 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// load image, create texture and generate mipmaps
-	data = stbi_load("resources/textures/brick.png", &width, &height, &nrChannels, 0);
+	data = stbi_load("TEXTURES/t1.png", &width, &height, &nrChannels, 0);
 	if (data)
 	{
 		// note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
@@ -238,6 +232,10 @@ int main() {
 	}
 
 	// free the GLFWwindow* object
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteTextures(1, &texture1);
+	glDeleteTextures(1, &texture2);
 	glfwTerminate();
 
 	// successful launch
